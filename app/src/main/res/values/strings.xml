@@ -7,7 +7,8 @@
     <string name="hint_et_add_item">Enter a new item</string>
     <string name="add_item_btn">Add</string>
     <string name="hint_btn_add_item">Enter a new item</string>
-    <string name="title_activity_edit_item">EditItemActivity</string>
+    <string name="title_activity_edit_item">Edit Item</string>
+    <string name="title_activity_todo_list">ToDo</string>
     <string name="text_btnSaveEditedItem">Save</string>
     <string name="hint_btnSaveEditedItem">Click to save the change</string>
     <string name="text_tvEditView">Edit Item Below:</string>
