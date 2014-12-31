@@ -4,26 +4,23 @@ Android-SimpleToDo
 Prework for CodePath Android SimpleToDo
 
 
-Time spent: 3 hours spent in total
+Time spent: 5 hours spent in total
 
 Completed user stories:
 
 * [x] Required: User can add and remove items from a list
 * [x] Required: User can edit items in a list
 * [x] Required: The list is persisted on file.
+* [x] (Suggested) Persist the todo items into SQLite instead of a text file.
+* [x] (Suggested) Used custom adapter to display TodoItem object data.
 
 Notes:
 
-This is the initial commit with the base requirements for getting accepted to the course.
-Future iterations
+Further iterations with suggested features.
 
-Walkthrough of list add, remove, edit:
+Walkthrough of SQLite persistence using ActiveAndroid and CustomAdapters for display:
 
-![Video Walkthrough](walkthrough-simpleToDo.gif)
-
-Walkthrough of list persistence:
-
-![Video Walkthrough](walkthrough-persistence.gif)
+![Video Walkthrough](walkthrough-dbAndCustomAdapter.gif)
 
 
 GIF created with [Recordit](http://recordit.co/) as LiceCap did not work on Yosemite.
