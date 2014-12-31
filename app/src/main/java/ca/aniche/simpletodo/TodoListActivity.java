@@ -1,6 +1,7 @@
 package ca.aniche.simpletodo;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,25 +19,30 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import ca.aniche.simpletodo.dao.TodoItemDao;
+import ca.aniche.simpletodo.model.TodoItem;
 
 
 public class TodoListActivity extends ActionBarActivity {
 
     private static final int REQUEST_CODE = 200; //Random code
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<TodoItem> items;
+    TodoItemArrayAdapter itemsAdapter;
     ListView lvItems;
-
     Button btAddItem;
 
+    //TODO: Introduce Dependency Injection with Guice or somethinge lse
+    TodoItemDao todoItemDao = new TodoItemDao();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_list);
-        readItems();
+        items = (ArrayList<TodoItem>) getItems();
+        itemsAdapter = new TodoItemArrayAdapter(this, items);
         lvItems = (ListView) findViewById(R.id.lvItems);
-        itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         lvItems.setAdapter(itemsAdapter);
         setupListViewListener();
 
@@ -48,9 +54,11 @@ public class TodoListActivity extends ActionBarActivity {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent,
                                                View view, int position, long id) {
+                    TodoItem item = items.get(position);
                     items.remove(position);
+                    todoItemDao.delete(item);
+                    Toast.makeText(parent.getContext(), "Deleted item with ID " + id, Toast.LENGTH_SHORT).show();
                     itemsAdapter.notifyDataSetChanged();
-                    writeItems();
                     return true;
                 }
         });
@@ -61,7 +69,7 @@ public class TodoListActivity extends ActionBarActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent i = new Intent(TodoListActivity.this, EditItemActivity.class);
-                        i.putExtra("itemText", items.get(position));
+                        i.putExtra("itemText", items.get(position).getBody());
                         i.putExtra("itemPos", position);
                         startActivityForResult(i, REQUEST_CODE);
                     }
@@ -70,6 +78,7 @@ public class TodoListActivity extends ActionBarActivity {
     }
 
     @Override
+    //Called after Edit is done
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // REQUEST_CODE is defined above
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
@@ -78,10 +87,11 @@ public class TodoListActivity extends ActionBarActivity {
             if(pos < 0){
                 Toast.makeText(this, "Could not update text. Position Unknown", Toast.LENGTH_SHORT).show();
             }
-            items.set(pos, newText);
+            TodoItem item = items.get(pos);
+            item.setBody(newText);
+            item.save();
             itemsAdapter.notifyDataSetChanged();
-            writeItems();
-            Toast.makeText(this, "Updated Item", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Updated Item with ID " + item.getId(), Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -114,29 +124,20 @@ public class TodoListActivity extends ActionBarActivity {
         if (newItem == null && "".equals(newItem.trim())){
            return;
         }
-        itemsAdapter.add(newItem);
+        TodoItem item = new TodoItem();
+        item.setBody(newItem);
+        item.setPriority(itemsAdapter.getCount() + 1);
+        itemsAdapter.add(item);
+        Long id = saveItem(item);
+        Toast.makeText(this, "Saved item with ID " + id, Toast.LENGTH_SHORT).show();
         etNewItem.setText("");
-        writeItems();
     }
 
-    private void readItems(){
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            items = new ArrayList<>(FileUtils.readLines(todoFile));
-
-        } catch(IOException ioe){
-            items = new ArrayList<>();
-        }
+    private Long saveItem(TodoItem item) {
+        return todoItemDao.save(item);
     }
 
-    private void writeItems(){
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public List<TodoItem> getItems() {
+        return todoItemDao.findAll();
     }
 }
