@@ -75,6 +75,7 @@ public class TodoListActivity extends ActionBarActivity {
                     }
                 }
         );
+
     }
 
     @Override
@@ -127,8 +128,10 @@ public class TodoListActivity extends ActionBarActivity {
         TodoItem item = new TodoItem();
         item.setBody(newItem);
         item.setPriority(itemsAdapter.getCount() + 1);
+        item.setCompleted(false);
         itemsAdapter.add(item);
         Long id = saveItem(item);
+        itemsAdapter.notifyDataSetChanged();
         Toast.makeText(this, "Saved item with ID " + id, Toast.LENGTH_SHORT).show();
         etNewItem.setText("");
     }

@@ -13,6 +13,9 @@ public class TodoItem extends Model {
     @Column(name = "Priority")
     private int priority;
 
+    @Column(name = "Completed", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private int completed;
+
     public String getBody() {
         return body;
     }
@@ -27,6 +30,14 @@ public class TodoItem extends Model {
 
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+
+    public boolean isCompleted(){
+        return completed > 0 ? true: false;
+    }
+
+    public void setCompleted(boolean isCompleted){
+        this.completed = isCompleted ? 1 : 0;
     }
 
 }
